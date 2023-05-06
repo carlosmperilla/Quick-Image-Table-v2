@@ -51,6 +51,8 @@
     const { status, signOut } = useAuth()
     const { notify}  = useNotification()
 
+    const notifyLoggedIn = useCookie('notifyLoggedIn')
+
     const isModalOpen = ref(false)
     const products = reactive([])
     const dialog = ref(null)
@@ -130,7 +132,6 @@
         closeButton.value.focus()
     }
 
-    let notifyLoggedIn = useCookie('notifyLoggedIn')
     onMounted(() => {
         if (notifyLoggedIn.value){
             setTimeout(() => {
@@ -140,9 +141,9 @@
                         duration: 1000,
                     })
             }, 100)
-        notifyLoggedIn.value = undefined
-    }
-    reloadProducts()
+            notifyLoggedIn.value = undefined
+        }
+        reloadProducts()
     })
 </script>
 

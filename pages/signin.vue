@@ -30,15 +30,17 @@
         
     const { signIn } = useAuth()
 
+    const notifyLoggedIn = useCookie('notifyLoggedIn')
+
     const form = ref(null)
     const userSignData = reactive({
                                     username: '',
                                     password: ''
                                     })
-    const reportValidity = () => form.value.reportValidity()
     const signinErrors = reactive([])
 
-    const notifyLoggedIn = useCookie('notifyLoggedIn')
+
+    const reportValidity = () => form.value.reportValidity()
     const mySignInHandler = async () => {
 
         if (!reportValidity()) {
@@ -97,6 +99,17 @@
         .form__container {
             height: auto;
             margin-bottom: 10px;
+        }
+    }
+
+    @media screen and (min-width: 700px) {
+        .form__container {
+            #signin__form {
+                display: flex;
+                flex-direction: row;
+                gap: 10px;
+                margin-right: 10px;
+            }
         }
     }
 </style>
