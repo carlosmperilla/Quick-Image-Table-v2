@@ -67,3 +67,79 @@
         }
     }
 }
+
+@mixin sign-form-content($primary-color, $secondary-color, $focus-color) {
+    fieldset {
+        display: flex;
+        flex-direction: column;
+        padding: 8px 10px;
+        padding-bottom: 10px;
+        background-color: $primary-color;
+        border-radius: 15px;
+        border: none;
+        height: fit-content;
+        legend {
+            padding: 5px;
+            background-color: $secondary-color;
+            color: variables.$form-legend--color;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 4em;
+            font-weight: bold;
+            user-select: none;
+        }
+        label {
+            margin-bottom: 2px;
+            color: variables.$form-label--color;
+            font-size: 3em;
+            font-weight: bold;
+            user-select: none;
+        }
+        input {
+            padding-left: 1em;
+            color: variables.$form-input--color;
+            border-radius: 25px;
+            font-size: 2.5em;
+            border: none;
+            &:not(:last-child){
+                margin-bottom: 5px;
+            }
+        }
+        &:focus-within {
+            background-color: $secondary-color;
+        }
+        button {
+            margin-top: 10px;
+            padding: 20px;
+            border-radius: 25px;
+            border: none;
+            font-size: 3em;
+            font-weight: bold;
+            color: antiquewhite;
+            user-select: none;
+            cursor: pointer;
+            background: $focus-color;
+            transition: all .3s ease;
+            &:hover {
+                filter: sepia(50%)
+            }
+            &:active {
+                transform: scale(.9);
+            }
+        }
+    }   
+}
+
+@mixin errors-content {
+    .errors__container {
+        background: red;
+        color: ghostwhite;
+        padding: 20px;
+        padding-left: 2em;
+        margin-bottom: 10px;
+        margin-top: 10px;
+        font-size: 2em;
+        font-weight: bold;
+        border-radius: 25px;
+    }
+}

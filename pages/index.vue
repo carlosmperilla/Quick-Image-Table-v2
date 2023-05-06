@@ -1,49 +1,54 @@
 <template>
     <section>
-        <ProductTable 
-            :products="products" 
-            @update-product="updateProduct" 
-            @reload-products="reloadProducts"
-            @remove-products="removeProducts"
-            @clean-products="clean"
-            @show-dialog="showDialog"
-        />
-        <p class="no-products--message" v-if="products.length === 0">
-            <ClientOnly>
-                <font-awesome-icon :icon="['fas', 'face-meh']"/>
-                 No hay productos por el momento. <br>Añada clickeando en 
-                <font-awesome-icon :icon="['fas', 'circle-plus']"/>
-            </ClientOnly>
-        </p>
-        <Teleport to="body">
-            <dialog ref="dialog" @click.self="closeDialog">
-                <section class="dialog__inner-box">
-                    <button
-                        type="button"
-                        ref="closeButton"
-                        alt="Botón de 'Cerrar'"
-                        title="Botón de 'Cerrar'"
-                        @click="closeDialog" 
-                        class="dialog__close-button"
-                    >
-                        <ClientOnly>
-                            <font-awesome-icon :icon="['fas', 'circle-xmark']" />
-                        </ClientOnly>
-                    </button>
-                    <AddProduct 
-                        :products="products" 
-                        :is-started="isModalOpen"
-                        @add-product="addProductAndPersist" 
-                        @focus-close-button="focuscloseButton"
-                    />
-                </section>
-            </dialog>
-        </Teleport>
+        <section v-if="status === 'authenticated'">
+            <button @click="signOut">Desloguear</button>
+            <ProductTable 
+                :products="products" 
+                @update-product="updateProduct" 
+                @reload-products="reloadProducts"
+                @remove-products="removeProducts"
+                @clean-products="clean"
+                @show-dialog="showDialog"
+            />
+            <p class="no-products--message" v-if="products.length === 0">
+                <ClientOnly>
+                    <font-awesome-icon :icon="['fas', 'face-meh']"/>
+                    No hay productos por el momento. <br>Añada clickeando en 
+                    <font-awesome-icon :icon="['fas', 'circle-plus']"/>
+                </ClientOnly>
+            </p>
+            <Teleport to="body">
+                <dialog ref="dialog" @click.self="closeDialog">
+                    <section class="dialog__inner-box">
+                        <button
+                            type="button"
+                            ref="closeButton"
+                            alt="Botón de 'Cerrar'"
+                            title="Botón de 'Cerrar'"
+                            @click="closeDialog" 
+                            class="dialog__close-button"
+                        >
+                            <ClientOnly>
+                                <font-awesome-icon :icon="['fas', 'circle-xmark']" />
+                            </ClientOnly>
+                        </button>
+                        <AddProduct 
+                            :products="products" 
+                            :is-started="isModalOpen"
+                            @add-product="addProductAndPersist" 
+                            @focus-close-button="focuscloseButton"
+                        />
+                    </section>
+                </dialog>
+            </Teleport>
+        </section>
+        <PresentationNoLogin v-else/>
     </section>
 </template>
 
 <script setup>
     import { useNotification } from "@kyvg/vue3-notification";
+    const { status, signOut } = useAuth()
     const { notify}  = useNotification()
 
     const isModalOpen = ref(false)
@@ -125,8 +130,19 @@
         closeButton.value.focus()
     }
 
+    let notifyLoggedIn = useCookie('notifyLoggedIn')
     onMounted(() => {
-        reloadProducts()
+        if (notifyLoggedIn.value){
+            setTimeout(() => {
+                notify({
+                        type: "success",
+                        text: "¡Inicio de sesión correcto!",
+                        duration: 1000,
+                    })
+            }, 100)
+        notifyLoggedIn.value = undefined
+    }
+    reloadProducts()
     })
 </script>
 

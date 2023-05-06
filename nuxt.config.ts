@@ -1,7 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
     pages: true, // Para la configuración de las paginas.
-    modules: ['@sidebase/nuxt-pdf'],
+    modules: ['@sidebase/nuxt-pdf', '@sidebase/nuxt-auth'],
     css: [
       '@fortawesome/fontawesome-svg-core/styles.css'
     ],
@@ -34,4 +34,7 @@ export default defineNuxtConfig({
         }
       }
     },
+    auth: {
+      origin: 'http://localhost:3000',
+    }
 })

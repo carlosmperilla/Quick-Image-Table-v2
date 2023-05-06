@@ -13,6 +13,7 @@
     "@fortawesome/free-regular-svg-icons": "^6.4.0",
     "@fortawesome/free-solid-svg-icons": "^6.4.0",
     "@fortawesome/vue-fontawesome": "^3.0.3",
+    "@sidebase/nuxt-auth": "^0.6.0-beta.0",
     "@sidebase/nuxt-pdf": "^0.1.1",
     "file-saver": "^2.0.5",
     "jszip": "^3.10.1",
