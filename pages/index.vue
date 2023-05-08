@@ -5,10 +5,32 @@
                 <button @click="handlerSignOut">🔓 Cerrar sesión</button>
             </div>
             <div class="select-stock__container">
-                <label :class="{'selected-stock__label': currentStock === stock.uuid}" v-for="stock in stocks.data" :key="'label' + stock.uuid"><input type="radio" v-model="currentStock" :value="stock.uuid" >{{ stock.name }}</label>
-                <button @click="addStock">💼 Añadir Stock</button>
+                <label tabindex="0" @keydown.enter="() => currentStock = stock.uuid" :class="{'selected-stock__label': currentStock === stock.uuid}" v-for="stock in stocks.data" :key="'label' + stock.uuid"><input type="radio" v-model="currentStock" :value="stock.uuid" >{{ stock.name }}</label>
+                <button @click="showDialog">💼 Añadir Stock</button>
             </div>
             <Stock v-for="stock in stocks.data" :key="stock.uuid" :stock-key="stock.uuid" v-show="stock.uuid === currentStock"/>
+            <dialog ref="dialog" @click.self="closeDialog">
+                <section class="dialog__inner-box">
+                    <button
+                        type="button"
+                        ref="closeButton"
+                        alt="Botón de 'Cerrar'"
+                        title="Botón de 'Cerrar'"
+                        @click="closeDialog" 
+                        class="dialog__close-button"
+                    >
+                        <ClientOnly>
+                            <font-awesome-icon :icon="['fas', 'circle-xmark']" />
+                        </ClientOnly>
+                    </button>
+                    <section>
+                        <form @submit.prevent>
+                            <input v-model="stockName" type="text" maxlength="50" placeholder="Nombre de Tabla" required>
+                            <button @click="addStock">Crear Tabla</button>
+                        </form>
+                    </section>
+                </section>
+            </dialog>
         </section>
         <PresentationNoLogin v-else/>
     </section>
@@ -24,12 +46,46 @@
     const notifyLoggedOut = useCookie('notifyLoggedOut')
     
     const currentStock = ref('')
+    const stockName = ref('')
     const stocks = reactive({
         data: []
     })
+    const dialog = ref(null)
     
-    function addStock(){
-        stocks.push(`${Number.parseInt(stocks[stocks.length-1]) + 1}`)
+    function showDialog(){
+        dialog.value.showModal()
+    }
+
+    function closeDialog(){
+        dialog.value.close()
+    }
+
+    async function addStock(){
+        if (stockName.value.length > 0 && stockName.value.length <= 50){
+            const { data, error } = await useFetch('/api/stocks/', {
+              method: 'POST',
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: {
+                name: stockName.value
+              }
+            })
+            let typeNotify, textNotify
+            if (error.value) {
+                typeNotify = "error"
+                textNotify = "Ha ocurrido un error, recargue la pagina."
+            } else {
+                typeNotify = "success"
+                textNotify = "¡Tabla creada correctamente!"
+            }
+            notify({
+                type: typeNotify,
+                text: textNotify,
+                duration: 1000,
+            })
+        }
+        stockName.value = ""
     }
     
     async function handlerSignOut(){
@@ -77,25 +133,33 @@
             notifyLoggedOut.value = undefined
         }
 
-        while (pending.value){}
+        while (stockPending.value){}
         if (stocks.data.length > 0) {
             currentStock.value = stocks.data[0].uuid
         }
 
         // RECARGA DE STOCKS
         // const counn = ref(0)
-        setInterval(async () => {
-            await refresh()
-            if (stockError.value?.statusCode !== undefined){
-                await getSession()
-            }
-            stocks.data = stockData.value || stocks.data
-        }, 1000)
+        let refreshInterval
+        window.addEventListener("focus", () => {            
+            refreshInterval = setInterval(async () => {
+                await stockRefresh()
+                if (stockError.value?.statusCode !== undefined){
+                    await getSession()
+                }
+                stocks.data = stockData.value || stocks.data
+            }, 1000)
+            // console.log('entrando')
+        })
 
+        window.addEventListener("blur", () => {
+            clearInterval(refreshInterval)
+            // console.log('saliendo')
+        })
     })
 
     // RECARGA DE STOCKS
-    const { data:stockData, error:stockError, refresh, pending } = await useLazyFetch('/api/stocks/', {
+    const { data:stockData, error:stockError, refresh:stockRefresh, pending:stockPending } = await useLazyFetch('/api/stocks/', {
         method: 'GET',
     })
     stocks.data = stockData.value || stocks.data
@@ -106,6 +170,8 @@
 </script>
 
 <style lang="scss">
+    @use '@/assets/styles/sass/abstracts/variables';
+    
     .logout__container {
         padding-top: 25px;
         padding-bottom: 20px;
@@ -147,6 +213,11 @@
             &.selected-stock__label {
                     background-color: steelblue;
                 }
+            &:focus-visible {
+                outline: none;
+                border: variables.$outline-focus;
+                border-width: 3px;
+            }
         }
         button {
             background-color: teal;
