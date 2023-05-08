@@ -145,3 +145,13 @@
         margin-left: 10px;
     }
 }
+
+@mixin selected-stock-design {
+    color: whitesmoke;
+    width: fit-content;
+    height: fit-content;
+    padding: 5px 10px;
+    font-size: 1.5em;
+    font-weight: 500;
+    border-radius: 10px;
+}

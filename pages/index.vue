@@ -2,14 +2,14 @@
     <section>
         <section v-if="status === 'authenticated'">
             <div class="logout__container">
-                <button @click="handlerSignOut">🔓 Cerrar sesión</button>
+                <button @click="handlerSignOut" type="button">🔓 Cerrar sesión</button>
             </div>
             <div class="select-stock__container">
                 <label tabindex="0" @keydown.enter="() => currentStock = stock.uuid" :class="{'selected-stock__label': currentStock === stock.uuid}" v-for="stock in stocks.data" :key="'label' + stock.uuid"><input type="radio" v-model="currentStock" :value="stock.uuid" >{{ stock.name }}</label>
                 <button @click="showDialog">💼 Añadir Stock</button>
             </div>
             <Stock v-for="stock in stocks.data" :key="stock.uuid" :stock-key="stock.uuid" v-show="stock.uuid === currentStock"/>
-            <dialog ref="dialog" @click.self="closeDialog">
+            <dialog ref="dialog" @click.self="closeDialog" class="dialog__add-stock">
                 <section class="dialog__inner-box">
                     <button
                         type="button"
@@ -23,12 +23,10 @@
                             <font-awesome-icon :icon="['fas', 'circle-xmark']" />
                         </ClientOnly>
                     </button>
-                    <section>
-                        <form @submit.prevent>
-                            <input v-model="stockName" type="text" maxlength="50" placeholder="Nombre de Tabla" required>
-                            <button @click="addStock">Crear Tabla</button>
-                        </form>
-                    </section>
+                    <form @submit.prevent>
+                        <input v-model="stockName" type="text" maxlength="50" placeholder="Nombre de Tabla" required>
+                        <button @click="addStock" type="submit">Crear Tabla</button>
+                    </form>
                 </section>
             </dialog>
         </section>
@@ -78,6 +76,7 @@
             } else {
                 typeNotify = "success"
                 textNotify = "¡Tabla creada correctamente!"
+                closeDialog()
             }
             notify({
                 type: typeNotify,
@@ -171,6 +170,7 @@
 
 <style lang="scss">
     @use '@/assets/styles/sass/abstracts/variables';
+    @use '@/assets/styles/sass/abstracts/mixins';
     
     .logout__container {
         padding-top: 25px;
@@ -199,36 +199,67 @@
         padding: 0px 20px;
         padding-bottom: 10px;
         label {
+            @include mixins.selected-stock-design;
             background-color: cadetblue;
-            color: whitesmoke;
-            width: fit-content;
-            height: fit-content;
-            padding: 5px 10px;
-            font-size: 1.5em;
-            font-weight: 500;
-            border-radius: 10px;
+
             input {
                 display: none;
             }
             &.selected-stock__label {
                     background-color: steelblue;
+                    &:hover {
+                        filter: initial;
+                    }
                 }
             &:focus-visible {
                 outline: none;
                 border: variables.$outline-focus;
                 border-width: 3px;
             }
+            &:hover {
+                filter: grayscale(.5);
+            }
         }
         button {
+            @include mixins.selected-stock-design;
             background-color: teal;
-            color: whitesmoke;
-            width: fit-content;
-            height: fit-content;
-            padding: 5px 10px;
-            font-size: 1.5em;
-            font-weight: bold;
-            border-radius: 10px;
             border: none;
+            user-select: none;
+            &:hover {
+                filter: sepia(33%);
+            }
+        }
+    }
+
+    .dialog__add-stock {
+        form {
+            margin: 5px;
+            margin-top: 15px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            button {
+                border: none;
+                border-radius: 5px;
+                background-color: teal;
+                color: whitesmoke;
+                padding: 3px 5px;
+                font-size: 2em;
+                font-weight: bold;
+                width: 100%;
+                &:hover {
+                    filter: sepia(.33);
+                }
+            }
+            input {
+                border-radius: 5px;
+                border: 3px solid teal;
+                padding-left: 1em;
+                font-size: 2em;
+                width: 100%;
+            };
         }
     }
 
