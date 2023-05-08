@@ -5,10 +5,10 @@
                 <button @click="handlerSignOut">🔓 Cerrar sesión</button>
             </div>
             <div class="select-stock__container">
-                <label :class="{'selected-stock__label': currentStock === stock}" v-for="stock in stocks" :key="'label' + stock"><input type="radio" v-model="currentStock" :value="stock" >{{ stock }}</label>
+                <label :class="{'selected-stock__label': currentStock === stock.uuid}" v-for="stock in stocks.data" :key="'label' + stock.uuid"><input type="radio" v-model="currentStock" :value="stock.uuid" >{{ stock.name }}</label>
                 <button @click="addStock">💼 Añadir Stock</button>
             </div>
-            <Stock v-for="stock in stocks" :key="stock" :stock-key="stock" v-show="stock === currentStock"/>
+            <Stock v-for="stock in stocks.data" :key="stock.uuid" :stock-key="stock.uuid" v-show="stock.uuid === currentStock"/>
         </section>
         <PresentationNoLogin v-else/>
     </section>
@@ -23,8 +23,10 @@
     const notifyLoggedIn = useCookie('notifyLoggedIn')
     const notifyLoggedOut = useCookie('notifyLoggedOut')
     
-    const currentStock = ref('1')
-    const stocks = reactive(['1', '2', '3'])
+    const currentStock = ref('')
+    const stocks = reactive({
+        data: []
+    })
     
     function addStock(){
         stocks.push(`${Number.parseInt(stocks[stocks.length-1]) + 1}`)
@@ -75,29 +77,31 @@
             notifyLoggedOut.value = undefined
         }
 
+        while (pending.value){}
+        if (stocks.data.length > 0) {
+            currentStock.value = stocks.data[0].uuid
+        }
+
         // RECARGA DE STOCKS
         // const counn = ref(0)
-        // setInterval(async () => {
-        //     await prueba.refresh()
-            
-        //     // console.log('refresh', prueba)
-        //     console.log('error', prueba.error.value?.statusCode)
-        //     console.log('error', prueba.error.value?.data)
-        //     console.log('data', prueba.data.value)
-        //     if (prueba.error.value?.statusCode !== undefined){
-        //         await getSession()
-        //         console.log('post-error')
-        //     }
-        //     counn.value++
-        //     console.log(counn.value)
-        // }, 3000)
+        setInterval(async () => {
+            await refresh()
+            if (stockError.value?.statusCode !== undefined){
+                await getSession()
+            }
+            stocks.data = stockData.value || stocks.data
+        }, 1000)
 
     })
 
     // RECARGA DE STOCKS
-    // const prueba = await useLazyFetch('/api/stocks/', {
-    //     method: 'GET',
-    // })
+    const { data:stockData, error:stockError, refresh, pending } = await useLazyFetch('/api/stocks/', {
+        method: 'GET',
+    })
+    stocks.data = stockData.value || stocks.data
+    if (stocks.data.length > 0) {
+        currentStock.value = stocks.data[0].uuid
+    }
 
 </script>
 

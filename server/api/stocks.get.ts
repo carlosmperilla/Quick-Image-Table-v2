@@ -25,5 +25,14 @@ export default eventHandler(async (event) => {
         throw ForbiddenError
     }
 
-    return (stockData as any).results
+    const newStockData = (stockData as any).results.map((obj: any) => {
+        let uuid = obj.url.match(/\/([a-f\d]{8}(-[a-f\d]{4}){3}-[a-f\d]{12}?)\//i)[1]
+        return {
+            ...obj, 
+            uuid: uuid,
+            url: undefined
+        }
+    })
+
+    return newStockData
 })
