@@ -1,46 +1,14 @@
 <template>
     <section>
         <section v-if="status === 'authenticated'">
-            <button @click="signOut">Desloguear</button>
-            <ProductTable 
-                :products="products" 
-                @update-product="updateProduct" 
-                @reload-products="reloadProducts"
-                @remove-products="removeProducts"
-                @clean-products="clean"
-                @show-dialog="showDialog"
-            />
-            <p class="no-products--message" v-if="products.length === 0">
-                <ClientOnly>
-                    <font-awesome-icon :icon="['fas', 'face-meh']"/>
-                    No hay productos por el momento. <br>Añada clickeando en 
-                    <font-awesome-icon :icon="['fas', 'circle-plus']"/>
-                </ClientOnly>
-            </p>
-            <Teleport to="body">
-                <dialog ref="dialog" @click.self="closeDialog">
-                    <section class="dialog__inner-box">
-                        <button
-                            type="button"
-                            ref="closeButton"
-                            alt="Botón de 'Cerrar'"
-                            title="Botón de 'Cerrar'"
-                            @click="closeDialog" 
-                            class="dialog__close-button"
-                        >
-                            <ClientOnly>
-                                <font-awesome-icon :icon="['fas', 'circle-xmark']" />
-                            </ClientOnly>
-                        </button>
-                        <AddProduct 
-                            :products="products" 
-                            :is-started="isModalOpen"
-                            @add-product="addProductAndPersist" 
-                            @focus-close-button="focuscloseButton"
-                        />
-                    </section>
-                </dialog>
-            </Teleport>
+            <div class="logout__container">
+                <button @click="handlerSignOut">🔓 Cerrar sesión</button>
+            </div>
+            <div class="select-stock__container">
+                <label :class="{'selected-stock__label': currentStock === stock}" v-for="stock in stocks" :key="'label' + stock"><input type="radio" v-model="currentStock" :value="stock" >{{ stock }}</label>
+                <button @click="addStock">💼 Añadir Stock</button>
+            </div>
+            <Stock v-for="stock in stocks" :key="stock" :stock-key="stock" v-show="stock === currentStock"/>
         </section>
         <PresentationNoLogin v-else/>
     </section>
@@ -48,89 +16,41 @@
 
 <script setup>
     import { useNotification } from "@kyvg/vue3-notification";
-    const { status, signOut, getSession } = useAuth()
     const { notify}  = useNotification()
 
-    const notifyLoggedIn = useCookie('notifyLoggedIn')
-
-    const isModalOpen = ref(false)
-    const products = reactive([])
-    const dialog = ref(null)
-    const closeButton = ref(null)
+    const { status, signOut, getSession } = useAuth()
     
-    function fillProducts(){
-        let localProducts = localStorage.getItem('productsQuickImageTable')
-        if (localProducts !== null) {
-            return JSON.parse(localProducts)
-        }
-        return []
+    const notifyLoggedIn = useCookie('notifyLoggedIn')
+    const notifyLoggedOut = useCookie('notifyLoggedOut')
+    
+    const currentStock = ref('1')
+    const stocks = reactive(['1', '2', '3'])
+    
+    function addStock(){
+        stocks.push(`${Number.parseInt(stocks[stocks.length-1]) + 1}`)
+    }
+    
+    async function handlerSignOut(){
+        notifyLoggedOut.value = true
+        await signOut()
     }
 
-    function showDialog(){
-        dialog.value.showModal()
-        isModalOpen.value = true
-    }
+    // Actualizacion de datos cada segundo.
 
-    function closeDialog(){
-        dialog.value.close()
-        isModalOpen.value = false
-    }
+    // CREAR Botones que representan a los stocks para escoger.
+    // El ultimo (o el primero, si no hay más) es el de añadir stocks.
+    // La acción es POST a stocks desde la API.
 
-    function removeProducts(indexList) {
-        try {            
-            for (let index of indexList.sort((a, b) => b - a)) {
-                products.splice(index, 1)
-                localStorage.setItem('productsQuickImageTable', JSON.stringify(products))
-            }
-            notify({
-                type: "error",
-                text: "¡Productos eliminados correctamente!",
-                duration: 500,
-            });
-        } catch (error) {
-            console.error(error)
-        }
-    }
+    // Atributos y eventos Stock. [VERIFICAR MANEJO DE ERRORES, con datos erroneos]
+    // stock-key: para identificar al stock (extraida de la url)
+    // stock-name: Nombre de tabla inicial (traido de petición a API).
+    // @update-stock-name: Actualizador de nombre, dando petición PUT a API.
+    // products: Los productos iniciales (traidos de la petición a API)
+    // @update-products: Actualizador de products (cuando se editan), dando PUT a API (por cada producto editado).
+    // @delete-products: Elimina productos, ejecutado por cada producto DELETE a API.
+    // @delete-stock: Elimina la tabla entera, ejecuantdo DELETE al API del stock.
+    // @create-product: Añade un producto al stock de la API con POST. 
 
-    function reloadProducts() {
-        Object.assign(products, fillProducts())
-    }
-
-    function addProductAndPersist(product){
-        products.push(product)
-        localStorage.setItem('productsQuickImageTable', JSON.stringify(products))
-        closeDialog()
-        notify({
-            title: "Producto añadido correctamente",
-            text: `${product.name} - ${product.price} - ${product.quantity}`,
-            type: "warn",
-            duration: 1000
-        })
-    }
-
-    function clean(){
-        try {
-            localStorage.setItem('productsQuickImageTable', '[]')
-            products.length = 0
-            notify({
-                type: "error",
-                text: "¡Tabla eliminada correctamente!",
-                duration: 500,
-            })
-        } catch (error) {
-            console.error(error)
-        }
-    }
-
-    function updateProduct(index, value){
-        let key = Object.keys(value)
-        products[index][key] = value[key]
-        localStorage.setItem('productsQuickImageTable', JSON.stringify(products))
-    }
-
-    function focuscloseButton() {
-        closeButton.value.focus()
-    }
 
     onMounted(() => {
         if (notifyLoggedIn.value){
@@ -143,7 +63,17 @@
             }, 100)
             notifyLoggedIn.value = undefined
         }
-        reloadProducts()
+
+        if (notifyLoggedOut.value){
+            setTimeout(() => {
+                notify({
+                        type: "warn",
+                        text: "Sesión cerrada correctamente!",
+                        duration: 1000,
+                    })
+            }, 100)
+            notifyLoggedOut.value = undefined
+        }
 
         // RECARGA DE STOCKS
         // const counn = ref(0)
@@ -171,10 +101,66 @@
 
 </script>
 
-<style>
-    .no-products--message {
-        text-align: center;
-        font-size: 3em;
-        color: steelblue;
+<style lang="scss">
+    .logout__container {
+        padding-top: 25px;
+        padding-bottom: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        button {
+            padding: 5px;
+            border-radius: 10px;
+            border: none;
+            background: coral;
+            color: floralwhite;
+            font-size: 2.5em;
+            font-weight: bold;
+        }
+    }
+
+    .select-stock__container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        column-gap: 5px;
+        row-gap: 10px;
+        padding: 0px 20px;
+        padding-bottom: 10px;
+        label {
+            background-color: cadetblue;
+            color: whitesmoke;
+            width: fit-content;
+            height: fit-content;
+            padding: 5px 10px;
+            font-size: 1.5em;
+            font-weight: 500;
+            border-radius: 10px;
+            input {
+                display: none;
+            }
+            &.selected-stock__label {
+                    background-color: steelblue;
+                }
+        }
+        button {
+            background-color: teal;
+            color: whitesmoke;
+            width: fit-content;
+            height: fit-content;
+            padding: 5px 10px;
+            font-size: 1.5em;
+            font-weight: bold;
+            border-radius: 10px;
+            border: none;
+        }
+    }
+
+    @media screen and (min-width: 900px) {
+        .logout__container {
+            justify-content: flex-start;
+            padding-left: 30px;
+        }
     }
 </style>

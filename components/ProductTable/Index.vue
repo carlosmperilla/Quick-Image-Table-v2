@@ -54,6 +54,10 @@
         products: {
             type: Array,
             required: true
+        },
+        stockKey: {
+            type: String,
+            required: true
         }
     })
     
@@ -83,7 +87,7 @@
 
     // Funciones Generales
     function persistName(){
-        let localNameTable = localStorage.getItem('nameQuickImageTable')
+        let localNameTable = localStorage.getItem(`nameQuickImageTable-${props.stockKey}`)
         return localNameTable !== null ? localNameTable : defaultNameTable
     }
 
@@ -189,7 +193,7 @@
     }
 
     watch(nameTable, () => {
-        localStorage.setItem('nameQuickImageTable', nameTable.value)
+        localStorage.setItem(`nameQuickImageTable-${props.stockKey}`, nameTable.value)
     })
 
     watch(currentMode, () => {
