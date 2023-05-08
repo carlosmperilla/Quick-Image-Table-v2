@@ -27,6 +27,7 @@ async function signInCredentials({ username, password } : SingnInData){
   const errors: {messages: string[]} = {messages: []}
   const credentialsUsername = username || '' 
   const credentialsPassword = password || ''
+  let userData: Object;
   
   if (isInvalidLength(credentialsUsername, 0, 50)) {
     errors.messages.push('Longitud de usuario invalida.')
@@ -37,11 +38,14 @@ async function signInCredentials({ username, password } : SingnInData){
   }
 
   if (errors.messages.length > 0) {
-    throw new Error( JSON.stringify(errors) )
+    throw createError({
+      statusCode: 401,
+      statusMessage: JSON.stringify(errors),
+    })
   }
 
   try {          
-    const response : {access_token: string, refresh_token: string} = await $fetch('api/authentication/login/',{
+    const response : {access_token: string, refresh_token: string, user: any} = await $fetch('api/authentication/login/',{
       baseURL: 'https://quickimage.pythonanywhere.com/',
       method: 'POST',
       headers: { "Content-Type": "application/json" },
@@ -51,16 +55,25 @@ async function signInCredentials({ username, password } : SingnInData){
       })
     })
 
-    let { access_token, refresh_token } = response
-    console.log(access_token)
-    console.log(refresh_token)
+    let { access_token, refresh_token, user } = response
+    userData = {
+                id: user.id,
+                name: user.username,
+                username: user.username,
+                email: user.email,
+                password: credentialsPassword,
+                api_access_token: access_token,
+                api_refresh_token: refresh_token 
+              }
   } catch (error) {
     errors.messages.push('Verifique el usuario o contraseña.')
-    throw new Error( JSON.stringify(errors) )
+    throw createError({
+      statusCode: 401,
+      statusMessage: JSON.stringify(errors),
+    })
   }
 
-  const user = { id: '1', name: 'J Smith', username: 'jsmith', password: 'hunter2' }
-  return user
+  return userData
 
 }
 
@@ -71,6 +84,7 @@ async function signUpCredentials({ username, email, password1, password2 } : Sin
   const credentialsPassword1 = password1 || ''
   const credentialsPassword2 = password2 || ''
   const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+  let userData: Object;
 
   if (isInvalidLength(credentialsUsername, 0, 50)) {
     errors.messages.push('Longitud de usuario invalida.')
@@ -93,11 +107,14 @@ async function signUpCredentials({ username, email, password1, password2 } : Sin
   }
 
   if (errors.messages.length > 0) {
-    throw new Error( JSON.stringify(errors) )
+    throw createError({
+      statusCode: 401,
+      statusMessage: JSON.stringify(errors),
+    })
   }
 
   try {          
-    const response : {access_token: string, refresh_token: string} = await $fetch('api/registration/',{
+    const response : {access_token: string, refresh_token: string, user: any} = await $fetch('api/registration/',{
       baseURL: 'https://quickimage.pythonanywhere.com/',
       method: 'POST',
       headers: { "Content-Type": "application/json" },
@@ -108,9 +125,16 @@ async function signUpCredentials({ username, email, password1, password2 } : Sin
           password2: credentialsPassword2
       })
     })
-    let { access_token, refresh_token } = response
-    console.log(access_token)
-    console.log(refresh_token)
+    let { access_token, refresh_token, user } = response
+    userData = {
+                id: user.id,
+                name: user.username,
+                username: user.username,
+                email: user.email,
+                password: credentialsPassword1,
+                api_access_token: access_token,
+                api_refresh_token: refresh_token 
+              }
   } catch (error:any) {
     errors.messages.push('Verifique sus datos de registro y vuelva a intentarlo.')
     if ('data' in error) {
@@ -118,11 +142,13 @@ async function signUpCredentials({ username, email, password1, password2 } : Sin
         errors.messages.push(message as string)
       }
     }
-    throw new Error( JSON.stringify(errors) )
+    throw createError({
+      statusCode: 401,
+      statusMessage: JSON.stringify(errors),
+    })
   }
 
-  const user = { id: '1', name: 'J Smith', username: 'jsmith', password: 'hunter2' }
-  return user
+  return userData
 }
 
 
@@ -132,7 +158,6 @@ const providers = [
     name: 'Credentials',
     credentials: {},
     async authorize (credentials: any) {
-      console.log(credentials)
       let user
       if ('password' in credentials) {
         user = await signInCredentials(credentials)
@@ -150,4 +175,35 @@ export default NuxtAuthHandler({
   secret,
   pages,
   providers,
+  callbacks: {
+    // Callback when the JWT is created / updated, see https://next-auth.js.org/configuration/callbacks#jwt-callback
+    jwt: async ({token, user}) => {
+      const isSignIn = user ? true : false;
+      if (isSignIn){
+        token.api_access_token = (user as any).api_access_token
+        token.api_refresh_token = (user as any).api_refresh_token
+      } else {
+        try {
+          const response : {access: string, access_token_expiration: string} = await $fetch('api/authentication/token/refresh/',{
+            baseURL: 'https://quickimage.pythonanywhere.com/',
+            method: 'POST',
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              refresh: token.api_refresh_token,
+            })
+          })
+          token.api_access_token = response.access
+        } catch (error) {
+          console.warn(error)
+          return Promise.reject(token);
+        }
+      }
+      return Promise.resolve(token);
+    },
+    // Callback whenever session is checked, see https://next-auth.js.org/configuration/callbacks#session-callback
+    session: async ({session, token}) => {
+      (session as any).api_access_token = (token as any).api_access_token
+      return Promise.resolve(session);
+    },
+  },
 })

@@ -48,7 +48,7 @@
 
 <script setup>
     import { useNotification } from "@kyvg/vue3-notification";
-    const { status, signOut } = useAuth()
+    const { status, signOut, getSession } = useAuth()
     const { notify}  = useNotification()
 
     const notifyLoggedIn = useCookie('notifyLoggedIn')
@@ -144,7 +144,31 @@
             notifyLoggedIn.value = undefined
         }
         reloadProducts()
+
+        // RECARGA DE STOCKS
+        // const counn = ref(0)
+        // setInterval(async () => {
+        //     await prueba.refresh()
+            
+        //     // console.log('refresh', prueba)
+        //     console.log('error', prueba.error.value?.statusCode)
+        //     console.log('error', prueba.error.value?.data)
+        //     console.log('data', prueba.data.value)
+        //     if (prueba.error.value?.statusCode !== undefined){
+        //         await getSession()
+        //         console.log('post-error')
+        //     }
+        //     counn.value++
+        //     console.log(counn.value)
+        // }, 3000)
+
     })
+
+    // RECARGA DE STOCKS
+    // const prueba = await useLazyFetch('/api/stocks/', {
+    //     method: 'GET',
+    // })
+
 </script>
 
 <style>

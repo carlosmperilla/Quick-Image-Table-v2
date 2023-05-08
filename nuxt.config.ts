@@ -36,5 +36,5 @@ export default defineNuxtConfig({
     },
     auth: {
       origin: 'http://localhost:3000',
-    }
+    },
 })
