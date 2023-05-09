@@ -1,6 +1,7 @@
 import { getToken } from '#auth'
 
 export default eventHandler(async (event) => {
+    const slug = (event.context.params as any).slug
     const token = await getToken({ event })
     const ForbiddenError = createError({
                                 statusCode: 403,
@@ -15,9 +16,9 @@ export default eventHandler(async (event) => {
     const body = await readBody(event)
 
     try {        
-        stockData = await $fetch('api/stocks/',{
+        stockData = await $fetch(`api/stocks/${slug}`,{
             baseURL: 'https://quickimage.pythonanywhere.com/',
-            method: 'POST',
+            method: 'PUT',
             headers: {
                 "Authorization": `Bearer ${(token as any).api_access_token}`,
                 "Content-Type": "application/json",

@@ -6,7 +6,8 @@
                 <input
                     id="name-and-cost__input__name"
                     type="text"
-                    maxlength="20" 
+                    maxlength="50"
+                    minlength="1"
                     :value="nameTable"
                     @input="$emit('update:nameTable', $event.target.value)"
                 >

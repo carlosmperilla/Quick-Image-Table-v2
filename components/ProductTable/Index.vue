@@ -58,12 +58,15 @@
         stockKey: {
             type: String,
             required: true
+        },
+        stockName: {
+            type: String,
+            required: true
         }
     })
     
     const emit = defineEmits(['updateProduct', 'reloadProducts', 'removeProducts', 'cleanProducts', 'showDialog'])
     
-    const defaultNameTable = 'MyQuickTable'
     const tableModes = {
         view: 'view',
         edit: 'edit',
@@ -73,7 +76,7 @@
     // Nos permite mantener el modo de edición, 
     // aunque se cambie entre paginas de la aplicación web.
     const currentMode = useState(() => tableModes.view)
-    const nameTable = ref('')
+    const nameTable = ref(props.stockName)
     const loadingExportFile = ref(false)
     const tableCard = ref(false)
     
@@ -86,11 +89,6 @@
     0))
 
     // Funciones Generales
-    function persistName(){
-        let localNameTable = localStorage.getItem(`nameQuickImageTable-${props.stockKey}`)
-        return localNameTable !== null ? localNameTable : defaultNameTable
-    }
-
     function getPrintableElement(){
         let table = mainTable.value.getClone()
         let container = document.createElement('div')
@@ -151,7 +149,7 @@
                     autoPaging:'text' // Evita que el texto aparezca cortado entre pagina y pagina.
                 }
 
-            let fileName =  props.name !== '' ? `${nameTable.value}.pdf` : `${defaultNameTable}.pdf`
+            let fileName =  nameTable.value !== '' ? `${nameTable.value}.pdf` : `${props.stockName}.pdf`
             let container = getPrintableElement()
 
             loadingExportFile.value = true
@@ -192,8 +190,20 @@
         })
     }
 
-    watch(nameTable, () => {
-        localStorage.setItem(`nameQuickImageTable-${props.stockKey}`, nameTable.value)
+    watch(nameTable, async () => {
+        const { data, error } = await useFetch(`/api/stocks/${props.stockKey}/`, {
+            method: 'PUT',
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: {
+                name: nameTable.value
+            }
+        })
+
+        if (error.value) {
+            nameTable.value = props.stockName
+        }
     })
 
     watch(currentMode, () => {
@@ -204,10 +214,6 @@
         if (currentMode.value === tableModes.delete) {
             checkedProducts.length = 0 // reseteamos la lista de productos checkeados.
         }
-    })
-
-    onMounted(() => {
-        nameTable.value = persistName()
     })
 </script>
 

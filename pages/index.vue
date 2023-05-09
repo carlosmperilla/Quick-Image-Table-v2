@@ -1,6 +1,6 @@
 <template>
     <section>
-        <section v-if="status === 'authenticated'">
+        <section v-if="isAuthenticated">
             <div class="logout__container">
                 <button @click="handlerSignOut" type="button">🔓 Cerrar sesión</button>
             </div>
@@ -8,7 +8,13 @@
                 <label tabindex="0" @keydown.enter="() => currentStock = stock.uuid" :class="{'selected-stock__label': currentStock === stock.uuid}" v-for="stock in stocks.data" :key="'label' + stock.uuid"><input type="radio" v-model="currentStock" :value="stock.uuid" >{{ stock.name }}</label>
                 <button @click="showDialog">💼 Añadir Stock</button>
             </div>
-            <Stock v-for="stock in stocks.data" :key="stock.uuid" :stock-key="stock.uuid" v-show="stock.uuid === currentStock"/>
+            <Stock 
+                v-for="stock in stocks.data" 
+                :key="stock.uuid" 
+                v-show="stock.uuid === currentStock"
+                :stock-key="stock.uuid"
+                :stock-name="stock.name"
+            />
             <dialog ref="dialog" @click.self="closeDialog" class="dialog__add-stock">
                 <section class="dialog__inner-box">
                     <button
@@ -49,7 +55,9 @@
         data: []
     })
     const dialog = ref(null)
-    
+
+    const isAuthenticated = computed(() => status.value === 'authenticated')
+
     function showDialog(){
         dialog.value.showModal()
     }
@@ -133,7 +141,7 @@
         }
 
         // RECARGA DE STOCKS
-        if (status.value === 'authenticated') {
+        if (isAuthenticated.value) {
             while (stockPending.value){}
             if (stocks.data.length > 0) {
                 currentStock.value = stocks.data[0].uuid
@@ -156,10 +164,10 @@
         }
     })
 
-    const { data:stockData, error:stockError, refresh:stockRefresh, pending:stockPending } = await useLazyFetch('/api/stocks/', {
+    const { data:stockData, error:stockError, refresh:stockRefresh, pending:stockPending } = isAuthenticated.value ? await useLazyFetch('/api/stocks/', {
         method: 'GET',
-    })
-    stocks.data = stockData.value || stocks.data
+    }) : {}
+    stocks.data = stockData?.value || stocks.data
     if (stocks.data.length > 0) {
         currentStock.value = stocks.data[0].uuid
     }

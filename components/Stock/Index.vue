@@ -3,6 +3,7 @@
         <ProductTable 
             :products="products" 
             :stock-key="stockKey"
+            :stock-name="stockName"
             @update-product="updateProduct" 
             @reload-products="reloadProducts"
             @remove-products="removeProducts"
@@ -52,6 +53,10 @@
             type: String,
             required: true
         },
+        stockName: {
+            type: String,
+            required: true
+        }
     })
 
     const isModalOpen = ref(false)
