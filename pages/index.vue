@@ -132,32 +132,30 @@
             notifyLoggedOut.value = undefined
         }
 
-        while (stockPending.value){}
-        if (stocks.data.length > 0) {
-            currentStock.value = stocks.data[0].uuid
-        }
-
         // RECARGA DE STOCKS
-        // const counn = ref(0)
-        let refreshInterval
-        window.addEventListener("focus", () => {            
-            refreshInterval = setInterval(async () => {
-                await stockRefresh()
-                if (stockError.value?.statusCode !== undefined){
-                    await getSession()
-                }
-                stocks.data = stockData.value || stocks.data
-            }, 1000)
-            // console.log('entrando')
-        })
+        if (status.value === 'authenticated') {
+            while (stockPending.value){}
+            if (stocks.data.length > 0) {
+                currentStock.value = stocks.data[0].uuid
+            }
 
-        window.addEventListener("blur", () => {
-            clearInterval(refreshInterval)
-            // console.log('saliendo')
-        })
+            let refreshInterval
+            window.addEventListener("focus", () => {            
+                refreshInterval = setInterval(async () => {
+                    await stockRefresh()
+                    if (stockError.value?.statusCode !== undefined){
+                        await getSession()
+                    }
+                    stocks.data = stockData.value || stocks.data
+                }, 1000)
+            })
+
+            window.addEventListener("blur", () => {
+                clearInterval(refreshInterval)
+            })
+        }
     })
 
-    // RECARGA DE STOCKS
     const { data:stockData, error:stockError, refresh:stockRefresh, pending:stockPending } = await useLazyFetch('/api/stocks/', {
         method: 'GET',
     })
@@ -165,7 +163,6 @@
     if (stocks.data.length > 0) {
         currentStock.value = stocks.data[0].uuid
     }
-
 </script>
 
 <style lang="scss">
