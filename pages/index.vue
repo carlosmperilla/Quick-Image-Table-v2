@@ -137,7 +137,7 @@
     // [ahora sí añadir producto, mediante api, interna] [HECHO]
     // products: Los productos iniciales (traidos de la petición a API) [HECHO]
     // @create-product: Añade un producto al stock de la API con POST. [HECHO]
-    // @delete-products: Elimina productos, ejecutado por cada producto DELETE a API.
+    // @delete-products: Elimina productos, ejecutado por cada producto DELETE a API. [HECHO]
     // @update-products: Actualizador de products (cuando se editan), dando PUT a API (por cada producto editado).
 
     let refreshInterval
