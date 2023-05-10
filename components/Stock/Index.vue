@@ -109,10 +109,11 @@
         })
     }
 
-    function clean(){
+    async function clean(){
         try {
-            localStorage.setItem(`productsQuickImageTable-${props.stockKey}`, '[]')
-            products.length = 0
+            const { data, error } = await useFetch(`/api/stocks/${props.stockKey}/`, {
+                method: 'DELETE',
+            })
             notify({
                 type: "error",
                 text: "¡Tabla eliminada correctamente!",

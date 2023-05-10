@@ -4,16 +4,24 @@
             <div class="logout__container">
                 <button @click="handlerSignOut" type="button">🔓 Cerrar sesión</button>
             </div>
-            <div class="select-stock__container">
-                <label tabindex="0" @keydown.enter="() => currentStock = stock.uuid" :class="{'selected-stock__label': currentStock === stock.uuid}" v-for="stock in stocks.data" :key="'label' + stock.uuid"><input type="radio" v-model="currentStock" :value="stock.uuid" >{{ stock.name }}</label>
-                <button @click="showDialog">💼 Añadir Stock</button>
-            </div>
-            <Stock 
-                v-for="stock in stocks.data" 
-                :key="stock.uuid" 
-                v-show="stock.uuid === currentStock"
-                :stock-key="stock.uuid"
-            />
+            <ClientOnly fallback-tag="span" fallback="Cargando stocks...">
+                <div class="select-stock__container">
+                    <label tabindex="0" @keydown.enter="() => currentStock = stock.uuid" :class="{'selected-stock__label': currentStock === stock.uuid}" v-for="stock in stocks.data" :key="'label' + stock.uuid"><input type="radio" v-model="currentStock" :value="stock.uuid" >{{ stock.name }}</label>
+                    <button @click="showDialog">💼 Añadir Stock</button>
+                </div>
+                <Stock 
+                    v-for="stock in stocks.data" 
+                    :key="stock.uuid" 
+                    v-show="stock.uuid === currentStock"
+                    :stock-key="stock.uuid"
+                />
+                <p class="no-stocks--message" v-if="(typeof stockData) !== 'undefined' && stockLength === 0">
+                    Sin stocks por el momento.
+                </p>
+                <template #fallback>
+                    <p class="loading-stocks">Cargando información de tablas...</p>
+                </template>
+            </ClientOnly>
             <dialog ref="dialog" @click.self="closeDialog" class="dialog__add-stock">
                 <section class="dialog__inner-box">
                     <button
@@ -51,10 +59,6 @@
     const currentStock = ref('')
     const stockName = ref('')
 
-
-    // const stocks = reactive({
-    //     data: []
-    // })
     const stocks = useState('stocks', () => {
         return {
             data: []
@@ -64,6 +68,7 @@
     const dialog = ref(null)
 
     const isAuthenticated = computed(() => status.value === 'authenticated')
+    const stockLength = computed(() => stocks.value.data.length)
 
     function showDialog(){
         dialog.value.showModal()
@@ -107,20 +112,28 @@
         await signOut()
     }
 
+    function setCurrentStock(){
+        if (stocks.value.data.length > 0) {
+            currentStock.value = stocks.value.data[0].uuid
+        }
+    }
+
     // Actualizacion de datos cada segundo.
 
     // CREAR Botones que representan a los stocks para escoger.
-    // El ultimo (o el primero, si no hay más) es el de añadir stocks.
-    // La acción es POST a stocks desde la API.
+    // El ultimo (o el primero, si no hay más) es el de añadir stocks. [HECHO]
+    // La acción es POST a stocks desde la API. [HECHO]
 
     // Atributos y eventos Stock. [VERIFICAR MANEJO DE ERRORES, con datos erroneos]
-    // stock-key: para identificar al stock (extraida de la url)
-    // stock-name: Nombre de tabla inicial (traido de petición a API).
-    // @update-stock-name: Actualizador de nombre, dando petición PUT a API.
+    // stock-key: para identificar al stock (extraida de la url) [HECHO]
+    // stock-name: Nombre de tabla inicial (traido de petición a API). [HECHO]
+    // @update-stock-name: Actualizador de nombre, dando petición PUT a API. [HECHO]
+    // @delete-stock: Elimina la tabla entera, ejecuantdo DELETE al API del stock. [HECHO]
+
+    // [PENDIENTE]
     // products: Los productos iniciales (traidos de la petición a API)
     // @update-products: Actualizador de products (cuando se editan), dando PUT a API (por cada producto editado).
     // @delete-products: Elimina productos, ejecutado por cada producto DELETE a API.
-    // @delete-stock: Elimina la tabla entera, ejecuantdo DELETE al API del stock.
     // @create-product: Añade un producto al stock de la API con POST. 
 
     let refreshInterval
@@ -133,6 +146,12 @@
             stocks.value.data = stockData.value || stocks.value.data
         }, 1000)
     }
+
+    watch(stockLength, () => {
+        setCurrentStock()
+    }, {
+        immediate: true
+    })
 
     onMounted(() => {
         if (notifyLoggedIn.value){
@@ -160,9 +179,6 @@
         // RECARGA DE STOCKS
         if (isAuthenticated.value) {
             while (stockPending.value){}
-            if (stocks.value.data.length > 0) {
-                currentStock.value = stocks.value.data[0].uuid
-            }
             
             loadRefreshInterval()
 
@@ -180,9 +196,6 @@
         method: 'GET',
     }) : {}
     stocks.value.data = stockData?.value || stocks.value.data
-    if (stocks.value.data.length > 0) {
-        currentStock.value = stocks.value.data[0].uuid
-    }
 </script>
 
 <style lang="scss">
@@ -204,6 +217,16 @@
             font-size: 2.5em;
             font-weight: bold;
         }
+    }
+
+    .loading-stocks,
+    .no-stocks--message {
+        height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3em;
+        color: steelblue;
     }
 
     .select-stock__container {
