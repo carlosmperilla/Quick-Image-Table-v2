@@ -58,10 +58,6 @@
         stockKey: {
             type: String,
             required: true
-        },
-        stockName: {
-            type: String,
-            required: true
         }
     })
     
@@ -75,14 +71,19 @@
 
     // Nos permite mantener el modo de edición, 
     // aunque se cambie entre paginas de la aplicación web.
+    const stocks = useState('stocks')
     const currentMode = useState(() => tableModes.view)
-    const nameTable = ref(props.stockName)
+    
+    const nameTable = ref('')
     const loadingExportFile = ref(false)
     const tableCard = ref(false)
+    const inputChange = ref(false)
+    const stockNameChange = ref(false)
     
     const checkedProducts = reactive([])
     
     const mainTable = ref()
+    const getStockName = computed(() => stocks.value.data.filter(stock => stock.uuid === props.stockKey)[0].name)
 
     const totalCost = computed(() => props.products.reduce(
             (accumulator, currentValue) => accumulator + currentValue.price*currentValue.quantity,
@@ -149,7 +150,7 @@
                     autoPaging:'text' // Evita que el texto aparezca cortado entre pagina y pagina.
                 }
 
-            let fileName =  nameTable.value !== '' ? `${nameTable.value}.pdf` : `${props.stockName}.pdf`
+            let fileName =  nameTable.value !== '' ? `${nameTable.value}.pdf` : `${getStockName.value}.pdf`
             let container = getPrintableElement()
 
             loadingExportFile.value = true
@@ -191,20 +192,30 @@
     }
 
     watch(nameTable, async () => {
+        if (stockNameChange.value){
+            stockNameChange.value = false
+            return null
+        }
+        inputChange.value = true
+        const nameTableValue = nameTable.value
         const { data, error } = await useFetch(`/api/stocks/${props.stockKey}/`, {
             method: 'PUT',
             headers: {
                 "Content-Type": "application/json",
             },
             body: {
-                name: nameTable.value
+                name: nameTableValue
             }
         })
-
-        if (error.value) {
-            nameTable.value = props.stockName
-        }
+        inputChange.value = false
     })
+
+    watch(getStockName, () => {
+        if (!inputChange.value){
+            nameTable.value = getStockName.value
+            stockNameChange.value = true
+        }
+    }, {flush: 'post', immediate: true})
 
     watch(currentMode, () => {
         if (currentMode.value === tableModes.view) {

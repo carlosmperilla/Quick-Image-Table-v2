@@ -13,7 +13,6 @@
                 :key="stock.uuid" 
                 v-show="stock.uuid === currentStock"
                 :stock-key="stock.uuid"
-                :stock-name="stock.name"
             />
             <dialog ref="dialog" @click.self="closeDialog" class="dialog__add-stock">
                 <section class="dialog__inner-box">
@@ -51,9 +50,17 @@
     
     const currentStock = ref('')
     const stockName = ref('')
-    const stocks = reactive({
-        data: []
+
+
+    // const stocks = reactive({
+    //     data: []
+    // })
+    const stocks = useState('stocks', () => {
+        return {
+            data: []
+        }
     })
+
     const dialog = ref(null)
 
     const isAuthenticated = computed(() => status.value === 'authenticated')
@@ -116,6 +123,16 @@
     // @delete-stock: Elimina la tabla entera, ejecuantdo DELETE al API del stock.
     // @create-product: Añade un producto al stock de la API con POST. 
 
+    let refreshInterval
+    function loadRefreshInterval(){
+        refreshInterval = setInterval(async () => {
+            await stockRefresh()
+            if (stockError.value?.statusCode !== undefined){
+                await getSession()
+            }
+            stocks.value.data = stockData.value || stocks.value.data
+        }, 1000)
+    }
 
     onMounted(() => {
         if (notifyLoggedIn.value){
@@ -143,19 +160,14 @@
         // RECARGA DE STOCKS
         if (isAuthenticated.value) {
             while (stockPending.value){}
-            if (stocks.data.length > 0) {
-                currentStock.value = stocks.data[0].uuid
+            if (stocks.value.data.length > 0) {
+                currentStock.value = stocks.value.data[0].uuid
             }
+            
+            loadRefreshInterval()
 
-            let refreshInterval
             window.addEventListener("focus", () => {            
-                refreshInterval = setInterval(async () => {
-                    await stockRefresh()
-                    if (stockError.value?.statusCode !== undefined){
-                        await getSession()
-                    }
-                    stocks.data = stockData.value || stocks.data
-                }, 1000)
+                loadRefreshInterval()
             })
 
             window.addEventListener("blur", () => {
@@ -167,9 +179,9 @@
     const { data:stockData, error:stockError, refresh:stockRefresh, pending:stockPending } = isAuthenticated.value ? await useLazyFetch('/api/stocks/', {
         method: 'GET',
     }) : {}
-    stocks.data = stockData?.value || stocks.data
-    if (stocks.data.length > 0) {
-        currentStock.value = stocks.data[0].uuid
+    stocks.value.data = stockData?.value || stocks.value.data
+    if (stocks.value.data.length > 0) {
+        currentStock.value = stocks.value.data[0].uuid
     }
 </script>
 

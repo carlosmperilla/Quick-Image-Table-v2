@@ -3,7 +3,6 @@
         <ProductTable 
             :products="products" 
             :stock-key="stockKey"
-            :stock-name="stockName"
             @update-product="updateProduct" 
             @reload-products="reloadProducts"
             @remove-products="removeProducts"
@@ -50,10 +49,6 @@
 
     const props = defineProps({
         stockKey: {
-            type: String,
-            required: true
-        },
-        stockName: {
             type: String,
             required: true
         }
