@@ -48,15 +48,17 @@
 
 <script setup>
     const props = defineProps({
-        products: {
-            type: Array,
-            required: true
-        },
         isStarted: {
             type: Boolean,
             required: true
+        },
+        stockKey: {
+            type: String,
+            required: true
         }
     })
+
+    const stocks = useState('stocks')
     
     const emit = defineEmits(['addProduct', 'focusCloseButton'])
 
@@ -84,7 +86,8 @@
     const prevButton = ref(null)
 
     provide('productInfo', productInfo)
-    
+
+    const products = computed(() => stocks.value.data.filter(stock => stock.uuid === props.stockKey)[0].products)
     const takePhotoIcon = computed(() => !hasPicture.value ? 'camera' : 'camera-rotate')
 
     // Funciones Generales.
@@ -95,7 +98,7 @@
     function generateUniqueNameProduct(){
         let randomId = Math.round(Math.random()*(10**5)).toString()
 
-        if (props.products.findIndex((product) => product.name === productInfo.name) !== -1) {
+        if (products.value.findIndex((product) => product.name === productInfo.name) !== -1) {
             productInfo.name += ' - ' + randomId
         }
     }

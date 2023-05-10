@@ -131,10 +131,14 @@
     // @delete-stock: Elimina la tabla entera, ejecuantdo DELETE al API del stock. [HECHO]
 
     // [PENDIENTE]
-    // products: Los productos iniciales (traidos de la petición a API)
-    // @update-products: Actualizador de products (cuando se editan), dando PUT a API (por cada producto editado).
+    // [cambiar de props a computadas y estados] [HECHO]
+    // [añadir id a las filas de tabla con el uuid del producto] [HECHO]
+    // [hacer lectura automatica en base al formato api, no al de localstorage] [HECHO]
+    // [ahora sí añadir producto, mediante api, interna] [HECHO]
+    // products: Los productos iniciales (traidos de la petición a API) [HECHO]
+    // @create-product: Añade un producto al stock de la API con POST. [HECHO]
     // @delete-products: Elimina productos, ejecutado por cada producto DELETE a API.
-    // @create-product: Añade un producto al stock de la API con POST. 
+    // @update-products: Actualizador de products (cuando se editan), dando PUT a API (por cada producto editado).
 
     let refreshInterval
     function loadRefreshInterval(){

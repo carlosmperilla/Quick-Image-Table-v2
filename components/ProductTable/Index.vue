@@ -38,9 +38,9 @@
                 :mode="currentMode" 
                 :products="products" 
                 :table-card="tableCard"
-                @update-product="(index, value) => emit('updateProduct', index, value) "
-                @add-removable-product="(index) => checkedProducts.push(index)"
-                @substract-removable-product="(index) => checkedProducts.splice(checkedProducts.indexOf(index), 1)"
+                @update-product="(uuid, value) => emit('updateProduct', uuid, value) "
+                @add-removable-product="(uuid) => checkedProducts.push(uuid)"
+                @substract-removable-product="(uuid) => checkedProducts.splice(checkedProducts.indexOf(uuid), 1)"
             />
         </section>
     </section>
@@ -51,17 +51,13 @@
     import saveAs from 'file-saver' // Para guardar el zip de imagenes.
 
     const props = defineProps({
-        products: {
-            type: Array,
-            required: true
-        },
         stockKey: {
             type: String,
             required: true
         }
     })
     
-    const emit = defineEmits(['updateProduct', 'reloadProducts', 'removeProducts', 'cleanProducts', 'showDialog'])
+    const emit = defineEmits(['updateProduct', 'removeProducts', 'cleanProducts', 'showDialog'])
     
     const tableModes = {
         view: 'view',
@@ -83,9 +79,10 @@
     const checkedProducts = reactive([])
     
     const mainTable = ref()
+    const products = computed(() => stocks.value.data.filter(stock => stock.uuid === props.stockKey)[0].products)
     const getStockName = computed(() => stocks.value.data.filter(stock => stock.uuid === props.stockKey)[0].name)
 
-    const totalCost = computed(() => props.products.reduce(
+    const totalCost = computed(() => products.value.reduce(
             (accumulator, currentValue) => accumulator + currentValue.price*currentValue.quantity,
     0))
 
@@ -114,7 +111,7 @@
 
     // Funciones Eventos
     function preRemovalProducts() {
-        let nameProductToRemoval = checkedProducts.map((index) => props.products[index].name).join(', ')
+        let nameProductToRemoval = checkedProducts.map((uuid) => products.value.filter(product => product.uuid === uuid)[0].name).join(', ')
         if (checkedProducts.length === 0) {
             alert('No hay productos para eliminar')
             return null
@@ -167,7 +164,7 @@
             let zip = new JSZip()
             
             loadingExportFile.value = true
-            props.products.map((product) => {
+            products.value.map((product) => {
                 let dataUrlIdentify = 'data:image/jpeg;base64,'
                 let validFileName = product.name.replace(/[<>:"\\/|?*]/g, (c) => '')
                 
@@ -219,7 +216,7 @@
 
     watch(currentMode, () => {
         if (currentMode.value === tableModes.view) {
-            emit('reloadProducts') // recargamos la tabla de productos.
+            // emit('reloadProducts') // recargamos la tabla de productos.
         }
         
         if (currentMode.value === tableModes.delete) {

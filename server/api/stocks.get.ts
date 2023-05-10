@@ -25,11 +25,21 @@ export default eventHandler(async (event) => {
         throw ForbiddenError
     }
 
-    const newStockData = (stockData as any).results.map((obj: any) => {
-        let uuid = obj.url.match(/\/([a-f\d]{8}(-[a-f\d]{4}){3}-[a-f\d]{12}?)\//i)[1]
+    const newStockData = (stockData as any).results.map((stock: any) => {
+        let regexUUID = /\/([a-f\d]{8}(-[a-f\d]{4}){3}-[a-f\d]{12}?)\//i
+        let uuidStock = stock.url.match(regexUUID)[1]
+        let products = stock.products.map((product: any) => {
+            let uuidProduct = product.url.match(regexUUID)[1]
+            return {
+                ...product,
+                uuid: uuidProduct,
+                url: undefined
+            }
+        })
         return {
-            ...obj, 
-            uuid: uuid,
+            ...stock, 
+            products,
+            uuid: uuidStock,
             url: undefined
         }
     })

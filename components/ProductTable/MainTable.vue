@@ -10,24 +10,24 @@
             </tr>
         </thead>
         <tbody>
-            <tr v-for="(product, index) in products" :key="index">
+            <tr v-for="product in products" :key="product.uuid">
                 <td class="table--card__checkbox-delete" v-if="isRemovable">
-                    <input type="checkbox" @change="(e) => updateRemovableProducts(index, e)">
+                    <input type="checkbox" @change="(e) => updateRemovableProducts(product.uuid, e)">
                 </td>
                 <td class="table--card__img">
-                    <img :src="product.imageData" :alt="product.name" :title="product.name" lazy="loading" width="90">
+                    <img :src="product.image_base64" :alt="product.name" :title="product.name" lazy="loading" width="90">
                 </td>
                 <td class="table--card__name">
                     {{ !isEditable ? product.name : '' }}
-                    <input type="text" name="name" v-if="isEditable" v-model="product.name" @input="(e) => updateProduct(index, e)" maxlength="50">
+                    <input type="text" name="name" v-if="isEditable" v-model="product.name" @input="(e) => updateProduct(product.uuid, e)" maxlength="50">
                 </td>
                 <td class="table--card__price">
                     {{ !isEditable ? product.price : '' }}
-                    <input type="number" name="price" min="0.0" step="0.01" v-if="isEditable" v-model="product.price" @input="(e) => updateProduct(index, e)">
+                    <input type="number" name="price" min="0.0" step="0.01" v-if="isEditable" v-model="product.price" @input="(e) => updateProduct(product.uuid, e)">
                 </td>
                 <td class="table--card__quantity">
                 {{ !isEditable ? product.quantity : '' }}
-                <input type="number" name="quantity" v-if="isEditable" v-model="product.quantity" @input="(e) => updateProduct(index, e)" min="0">
+                <input type="number" name="quantity" v-if="isEditable" v-model="product.quantity" @input="(e) => updateProduct(product.uuid, e)" min="0">
             </td>
             </tr>
         </tbody>
@@ -87,22 +87,22 @@
 
     // Funciones Eventos.
 
-    function updateRemovableProducts(index, e) {
+    function updateRemovableProducts(uuid, e) {
         if (e.target.checked) {
-            emit('addRemovableProduct', index)
+            emit('addRemovableProduct', uuid)
             return null
         }
-        emit('substractRemovableProduct', index)
+        emit('substractRemovableProduct', uuid)
     }
 
-    function updateProduct(index, event){
+    function updateProduct(uuid, event){
         if (event.target.value === '') {
             return null
         }
 
         let filterData = filterByField(event.target.name, event.target.value)
         
-        emit('updateProduct', index, { [event.target.name]: filterData })
+        emit('updateProduct', uuid, { [event.target.name]: filterData })
     }
 
     defineExpose({

@@ -1,10 +1,8 @@
 <template>
     <section>
         <ProductTable 
-            :products="products" 
             :stock-key="stockKey"
             @update-product="updateProduct" 
-            @reload-products="reloadProducts"
             @remove-products="removeProducts"
             @clean-products="clean"
             @show-dialog="showDialog"
@@ -32,8 +30,8 @@
                         </ClientOnly>
                     </button>
                     <AddProduct 
-                        :products="products" 
                         :is-started="isModalOpen"
+                        :stock-key="stockKey"
                         @add-product="addProductAndPersist" 
                         @focus-close-button="focuscloseButton"
                     />
@@ -54,19 +52,14 @@
         }
     })
 
+    const stocks = useState('stocks')
+    
     const isModalOpen = ref(false)
-    const products = reactive([])
     const dialog = ref(null)
     const closeButton = ref(null)
+                
+    const products = computed(() => stocks.value.data.filter(stock => stock.uuid === props.stockKey)[0].products)
     
-    function fillProducts(){
-        let localProducts = localStorage.getItem(`productsQuickImageTable-${props.stockKey}`)
-        if (localProducts !== null) {
-            return JSON.parse(localProducts)
-        }
-        return []
-    }
-
     function showDialog(){
         dialog.value.showModal()
         isModalOpen.value = true
@@ -77,14 +70,15 @@
         isModalOpen.value = false
     }
 
-    function removeProducts(indexList) {
-        try {            
-            for (let index of indexList.sort((a, b) => b - a)) {
-                products.splice(index, 1)
-                localStorage.setItem(`productsQuickImageTable-${props.stockKey}`, JSON.stringify(products))
-            }
+    function removeProducts(uuidList) {
+        try {
+            uuidList.map(async uuid => {
+                useFetch(`/api/products/${uuid}/`, {
+                    method: 'DELETE',
+                })
+            })
             notify({
-                type: "error",
+                type: "warn",
                 text: "¡Productos eliminados correctamente!",
                 duration: 500,
             });
@@ -93,18 +87,35 @@
         }
     }
 
-    function reloadProducts() {
-        Object.assign(products, fillProducts())
-    }
+    async function addProductAndPersist(product){
+        const { data, error } = await useFetch('/api/products/', {
+              method: 'POST',
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: {
+                ...product,
+                stock: props.stockKey,
+                image_base64: product.imageData,
+                imageData: undefined
+              }
+            })
 
-    function addProductAndPersist(product){
-        products.push(product)
-        localStorage.setItem(`productsQuickImageTable-${props.stockKey}`, JSON.stringify(products))
+            let typeNotify, titleNotify
+            if (error.value) {
+                typeNotify = "error"
+                titleNotify = "Ha ocurrido un error, recargue la pagina"
+            } else {
+                typeNotify = "warn"
+                titleNotify = "Producto añadido correctamente"
+                closeDialog()
+            }
+
         closeDialog()
         notify({
-            title: "Producto añadido correctamente",
+            title: titleNotify,
             text: `${product.name} - ${product.price} - ${product.quantity}`,
-            type: "warn",
+            type: typeNotify,
             duration: 1000
         })
     }
@@ -133,10 +144,6 @@
     function focuscloseButton() {
         closeButton.value.focus()
     }
-
-    onMounted(() => {
-        reloadProducts()
-    })
 </script>
 
 <style lang="scss">
