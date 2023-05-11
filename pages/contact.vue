@@ -12,7 +12,7 @@
         <section>
             <h2>Repositorio de este proyecto:</h2>
             <p>
-                <a href="https://github.com/carlosmperilla/Quick-Image-Table" target="_blank" rel="noopener">https://github.com/carlosmperilla/Quick-Image-Table</a>
+                <a href="https://github.com/carlosmperilla/Quick-Image-Table-v2" target="_blank" rel="noopener">https://github.com/carlosmperilla/Quick-Image-Table-v2</a>
             </p>
         </section>
         <section>

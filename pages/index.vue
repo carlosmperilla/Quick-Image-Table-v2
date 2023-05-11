@@ -51,6 +51,7 @@
     import { useNotification } from "@kyvg/vue3-notification";
     const { notify}  = useNotification()
 
+    const router = useRouter()
     const { status, signOut, getSession } = useAuth()
     
     const notifyLoggedIn = useCookie('notifyLoggedIn')
@@ -109,6 +110,7 @@
     
     async function handlerSignOut(){
         notifyLoggedOut.value = true
+        clearInterval(refreshInterval)
         await signOut()
     }
 
@@ -160,7 +162,7 @@
 
         // RECARGA DE STOCKS
         if (isAuthenticated.value) {
-            while (stockPending.value){}
+            // while (stockPending.value){}
             
             loadRefreshInterval()
 
@@ -178,6 +180,12 @@
         method: 'GET',
     }) : {}
     stocks.value.data = stockData?.value || stocks.value.data
+
+    router.beforeEach((nextRoute, prevRoute) => {
+        if (prevRoute.name === 'index') {
+            clearInterval(refreshInterval)
+        }
+    })
 </script>
 
 <style lang="scss">
