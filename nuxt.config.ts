@@ -37,4 +37,13 @@ export default defineNuxtConfig({
     auth: {
       origin: 'http://localhost:3000',
     },
+    routeRules: {
+      '/contact': { static: true },
+      '/howtouse': { static: true },
+      '/about': { static: true },
+      '/api/**': { cors: true }
+    },
+    // runtimeConfig: {
+    //   apiBase: process.env
+    // }
 })

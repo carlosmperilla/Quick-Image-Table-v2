@@ -9,6 +9,10 @@ export default eventHandler(async (event) => {
                                 statusCode: 403,
                                 statusMessage: 'Forbidden Error',
                             })
+    const InsufficientStorageError = createError({
+        statusCode: 507,
+        statusMessage: 'Insufficient Storage Error',
+    })
     let productData
 
     if  (token === null) {
@@ -31,6 +35,9 @@ export default eventHandler(async (event) => {
             })
         });
     } catch (error) {
+        if ((error as any)?.data?.detail === "Cuota de almacenamiento excedida") {
+            throw InsufficientStorageError
+        }
         console.warn(error)
         throw ForbiddenError
     }

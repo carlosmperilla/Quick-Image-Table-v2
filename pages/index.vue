@@ -1,6 +1,22 @@
 <template>
     <section>
         <section v-if="isAuthenticated">
+            <div class="excess-space__message" v-if="excessSpaceError">
+                <p>
+                    <strong>Espacio excedido:</strong> Este es un proyecto de muestra.
+                    Por lo que su espacio es limitado.
+                    Así que sera reseteado proximamente.
+                </p>
+                <p>
+                    Si necesita más espacio o conservar sus tablas almacenadas.
+                    Puede informarme a: carlosperillaprogramacion@gmail.com
+                </p>
+                <p>
+                    Si no necesita almacenamiento en la nube ó sincronización online,
+                    puede usar la versión v1:
+                    <a href="https://quickimagetable.netlify.app/" target="_blank" rel="noopener">https://quickimagetable.netlify.app/</a>
+                </p>
+            </div>
             <div class="logout__container">
                 <button @click="handlerSignOut" type="button">🔓 Cerrar sesión</button>
             </div>
@@ -14,6 +30,7 @@
                     :key="stock.uuid" 
                     v-show="stock.uuid === currentStock"
                     :stock-key="stock.uuid"
+                    @excess-space-error-trigger="excessSpaceErrorTrigger"
                 />
                 <p class="no-stocks--message" v-if="(typeof stockData) !== 'undefined' && stockLength === 0">
                     Sin stocks por el momento.
@@ -37,7 +54,7 @@
                         </ClientOnly>
                     </button>
                     <form @submit.prevent>
-                        <input v-model="stockName" type="text" maxlength="50" placeholder="Nombre de Tabla" required>
+                        <input v-model="stockName" type="text" maxlength="50" placeholder="Nombre de Tabla" required autofocus>
                         <button @click="addStock" type="submit">Crear Tabla</button>
                     </form>
                 </section>
@@ -57,6 +74,7 @@
     const notifyLoggedIn = useCookie('notifyLoggedIn')
     const notifyLoggedOut = useCookie('notifyLoggedOut')
     
+    const excessSpaceError = ref(false)
     const currentStock = ref('')
     const stockName = ref('')
 
@@ -79,6 +97,10 @@
         dialog.value.close()
     }
 
+    function excessSpaceErrorTrigger(){
+        excessSpaceError.value = true
+    }
+
     async function addStock(){
         if (stockName.value.length > 0 && stockName.value.length <= 50){
             const { data, error } = await useFetch('/api/stocks/', {
@@ -92,6 +114,9 @@
             })
             let typeNotify, textNotify
             if (error.value) {
+                if (error.value?.data?.statusCode === 507) {
+                    excessSpaceErrorTrigger()
+                }
                 typeNotify = "error"
                 textNotify = "Ha ocurrido un error, recargue la pagina."
             } else {
@@ -162,8 +187,6 @@
 
         // RECARGA DE STOCKS
         if (isAuthenticated.value) {
-            // while (stockPending.value){}
-            
             loadRefreshInterval()
 
             window.addEventListener("focus", () => {            
@@ -192,6 +215,19 @@
     @use '@/assets/styles/sass/abstracts/variables';
     @use '@/assets/styles/sass/abstracts/mixins';
     
+    .excess-space__message {
+        margin: 30px 20px;
+        background-color: #e83c3c;
+        padding: 10px 20px;
+        color: whitesmoke;
+        font-size: 1.5em;
+        border-radius: 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        text-align: justify;
+    }
+
     .logout__container {
         padding-top: 25px;
         padding-bottom: 20px;

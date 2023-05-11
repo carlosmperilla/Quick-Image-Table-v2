@@ -6,6 +6,7 @@
             @remove-products="removeProducts"
             @clean-products="clean"
             @show-dialog="showDialog"
+            @excess-space-error-trigger="$emit('excessSpaceErrorTrigger')"
         />
         <p class="no-products--message" v-if="products.length === 0">
             <ClientOnly>
@@ -51,6 +52,8 @@
             required: true
         }
     })
+
+    const emit = defineEmits(['excessSpaceErrorTrigger'])
 
     const stocks = useState('stocks')
     
@@ -103,6 +106,9 @@
 
             let typeNotify, titleNotify
             if (error.value) {
+                if (error.value?.data?.statusCode === 507) {
+                    emit('excessSpaceErrorTrigger')
+                }
                 typeNotify = "error"
                 titleNotify = "Ha ocurrido un error, recargue la pagina"
             } else {
@@ -143,6 +149,11 @@
             },
             body: value
         })
+        if (error.value) {
+            if (error.value?.data?.statusCode === 507) {
+                emit('excessSpaceErrorTrigger')
+            }
+        }
     }
 
     function focuscloseButton() {

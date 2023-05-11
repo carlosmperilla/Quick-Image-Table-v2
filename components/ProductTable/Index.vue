@@ -56,8 +56,8 @@
             required: true
         }
     })
-    
-    const emit = defineEmits(['updateProduct', 'removeProducts', 'cleanProducts', 'showDialog'])
+
+    const emit = defineEmits(['updateProduct', 'removeProducts', 'cleanProducts', 'showDialog', 'excessSpaceErrorTrigger'])
     
     const tableModes = {
         view: 'view',
@@ -204,6 +204,11 @@
                 name: nameTableValue
             }
         })
+        if (error.value){
+            if (error.value?.data?.statusCode === 507) {
+                emit('excessSpaceErrorTrigger')
+            }
+        }
         inputChange.value = false
     })
 
