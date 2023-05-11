@@ -214,11 +214,7 @@
         }
     }, {flush: 'post', immediate: true})
 
-    watch(currentMode, () => {
-        if (currentMode.value === tableModes.view) {
-            // emit('reloadProducts') // recargamos la tabla de productos.
-        }
-        
+    watch(currentMode, () => {        
         if (currentMode.value === tableModes.delete) {
             checkedProducts.length = 0 // reseteamos la lista de productos checkeados.
         }

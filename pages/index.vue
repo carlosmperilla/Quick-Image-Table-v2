@@ -118,28 +118,6 @@
         }
     }
 
-    // Actualizacion de datos cada segundo.
-
-    // CREAR Botones que representan a los stocks para escoger.
-    // El ultimo (o el primero, si no hay más) es el de añadir stocks. [HECHO]
-    // La acción es POST a stocks desde la API. [HECHO]
-
-    // Atributos y eventos Stock. [VERIFICAR MANEJO DE ERRORES, con datos erroneos]
-    // stock-key: para identificar al stock (extraida de la url) [HECHO]
-    // stock-name: Nombre de tabla inicial (traido de petición a API). [HECHO]
-    // @update-stock-name: Actualizador de nombre, dando petición PUT a API. [HECHO]
-    // @delete-stock: Elimina la tabla entera, ejecuantdo DELETE al API del stock. [HECHO]
-
-    // [PENDIENTE]
-    // [cambiar de props a computadas y estados] [HECHO]
-    // [añadir id a las filas de tabla con el uuid del producto] [HECHO]
-    // [hacer lectura automatica en base al formato api, no al de localstorage] [HECHO]
-    // [ahora sí añadir producto, mediante api, interna] [HECHO]
-    // products: Los productos iniciales (traidos de la petición a API) [HECHO]
-    // @create-product: Añade un producto al stock de la API con POST. [HECHO]
-    // @delete-products: Elimina productos, ejecutado por cada producto DELETE a API. [HECHO]
-    // @update-products: Actualizador de products (cuando se editan), dando PUT a API (por cada producto editado).
-
     let refreshInterval
     function loadRefreshInterval(){
         refreshInterval = setInterval(async () => {

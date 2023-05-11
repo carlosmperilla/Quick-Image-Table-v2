@@ -135,10 +135,14 @@
         }
     }
 
-    function updateProduct(index, value){
-        let key = Object.keys(value)
-        products[index][key] = value[key]
-        localStorage.setItem(`productsQuickImageTable-${props.stockKey}`, JSON.stringify(products))
+    async function updateProduct(uuid, value){
+        const { data, error } = await useFetch(`/api/products/${uuid}/`, {
+            method: 'PATCH',
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: value
+        })
     }
 
     function focuscloseButton() {
