@@ -163,7 +163,7 @@
     })
 
     onMounted(() => {
-        if (notifyLoggedIn.value){
+        if (notifyLoggedIn.value && isAuthenticated.value){
             setTimeout(() => {
                 notify({
                         type: "success",
@@ -174,7 +174,7 @@
             notifyLoggedIn.value = undefined
         }
 
-        if (notifyLoggedOut.value){
+        if (notifyLoggedOut.value && isAuthenticated.value){
             setTimeout(() => {
                 notify({
                         type: "warn",
