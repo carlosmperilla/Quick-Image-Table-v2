@@ -16,7 +16,7 @@ Para conservar las tablas, se pueden exportar en:
 * **Archivo comprimido ZIP:** Se compone de las imágenes, cada una de ellas contiene los datos de cada producto, para que pueda ser identificado con facilidad.
 
 ## Deploy URL
-https://quickimagetable.netlify.app/
+[https://quickimagetablev2.netlify.app/](https://quickimagetablev2.netlify.app/)
 
 ## Dependencies
 * npm 9.6.0
