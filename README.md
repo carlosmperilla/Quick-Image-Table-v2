@@ -18,6 +18,11 @@ Para conservar las tablas, se pueden exportar en:
 ## Deploy URL
 [https://quickimagetablev2.netlify.app/](https://quickimagetablev2.netlify.app/)
 
+## Guest
+Acceso a invitados:
+* **Username:** Invitados
+* **Password:** 123QWE###
+
 ## Dependencies
 * npm 9.6.0
 
