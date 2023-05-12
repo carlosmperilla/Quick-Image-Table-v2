@@ -250,6 +250,9 @@
             color: floralwhite;
             font-size: 2.5em;
             font-weight: bold;
+            &:hover {
+                cursor: pointer;
+            }
         }
     }
 
@@ -301,6 +304,7 @@
             user-select: none;
             &:hover {
                 filter: sepia(33%);
+                cursor: pointer;
             }
         }
     }
