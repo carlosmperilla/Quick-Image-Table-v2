@@ -1,7 +1,9 @@
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { NuxtAuthHandler } from '#auth'
 
-const secret = 'your-secret-here'
+
+const API_BASE = process.env.NUXT_API_BASE
+const secret = process.env.NUXT_SECRET
 
 const pages =  {
                  signIn: '/signin'
@@ -46,7 +48,7 @@ async function signInCredentials({ username, password } : SingnInData){
 
   try {          
     const response : {access_token: string, refresh_token: string, user: any} = await $fetch('api/authentication/login/',{
-      baseURL: 'https://quickimage.pythonanywhere.com/',
+      baseURL: API_BASE,
       method: 'POST',
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -115,7 +117,7 @@ async function signUpCredentials({ username, email, password1, password2 } : Sin
 
   try {          
     const response : {access_token: string, refresh_token: string, user: any} = await $fetch('api/registration/',{
-      baseURL: 'https://quickimage.pythonanywhere.com/',
+      baseURL: API_BASE,
       method: 'POST',
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -185,7 +187,7 @@ export default NuxtAuthHandler({
       } else {
         try {
           const response : {access: string, access_token_expiration: string} = await $fetch('api/authentication/token/refresh/',{
-            baseURL: 'https://quickimage.pythonanywhere.com/',
+            baseURL: API_BASE,
             method: 'POST',
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
