@@ -49,6 +49,7 @@
 
         signinErrors.length = 0
         const { username, password } = userSignData
+        const aaaa = await signIn('credentials', { username, password, redirect: false})
         const { error, url } = await signIn('credentials', { username, password, redirect: false})
         
         if (error) {
@@ -57,6 +58,9 @@
                 signinErrors.push(message)
             }
         } else {
+            console.log(aaaa)
+            console.log(url)
+            console.log(error)
             notifyLoggedIn.value = true
             return navigateTo(url, { external: true })
         }
