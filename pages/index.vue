@@ -1,5 +1,13 @@
 <template>
     <section>
+        <div>
+            <p>
+                {{ data }}
+            </p>
+            <p>
+                {{ status }}
+            </p>
+        </div>
         <section v-if="isAuthenticated">
             <div class="excess-space__message" v-if="excessSpaceError">
                 <p>
@@ -69,7 +77,7 @@
     const { notify}  = useNotification()
 
     const router = useRouter()
-    const { status, signOut, getSession } = useAuth()
+    const { status, signOut, getSession, data } = useAuth()
     
     const notifyLoggedIn = useCookie('notifyLoggedIn')
     const notifyLoggedOut = useCookie('notifyLoggedOut')
