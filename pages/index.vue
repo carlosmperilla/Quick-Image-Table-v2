@@ -1,13 +1,5 @@
 <template>
     <section>
-        <div>
-            <p>
-                {{ data }}
-            </p>
-            <p>
-                {{ status }}
-            </p>
-        </div>
         <section v-if="isAuthenticated">
             <div class="excess-space__message" v-if="excessSpaceError">
                 <p>
