@@ -31,8 +31,8 @@
             </ul>
         </section>
         <section class="authentication-box">
-            <NuxtLink to="/signup"><button class="authentication-box__signup__button" type="button">Registrarse</button></NuxtLink>
-            <NuxtLink to="/signin"><button class="authentication-box__signin__button" type="button">Iniciar sesión</button></NuxtLink>
+            <a href="/signup"><button class="authentication-box__signup__button" type="button">Registrarse</button></a>
+            <a href="/signin"><button class="authentication-box__signin__button" type="button">Iniciar sesión</button></a>
         </section>
     </section>
 </template>

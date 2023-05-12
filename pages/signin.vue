@@ -49,12 +49,8 @@
 
         signinErrors.length = 0
         const { username, password } = userSignData
-        // await signIn('credentials', { username, password, redirect: false})
-        // const { error:eje, url:aja } = await signIn('credentials', { username, password, redirect: false})
         const { error, url } = await signIn('credentials', { username, password, redirect: false})
-        
-        // console.log('1', eje, aja)
-        console.log('2', error, url)
+
         if (error) {
             const messages = JSON.parse(error).messages
             for (let message of messages) {
