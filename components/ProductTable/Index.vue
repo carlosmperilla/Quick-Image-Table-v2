@@ -5,6 +5,7 @@
             class="loading-file-bar"
         ></div>
         <ProductTableNameAndCost
+            :stock-key="stockKey"
             v-model:name-table="nameTable"
             :total-cost="totalCost"
         />

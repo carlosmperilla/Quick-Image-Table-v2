@@ -2,9 +2,9 @@
     <section class="name-and-cost">
         <header>
             <h1>
-                <label for="name-and-cost__input__name">Nombre:</label>
+                <label :for="'name-and-cost__input__name' + stockKey">Nombre:</label>
                 <input
-                    id="name-and-cost__input__name"
+                    :id="'name-and-cost__input__name' + stockKey"
                     type="text"
                     maxlength="50"
                     minlength="1"
@@ -20,6 +20,10 @@
 
 <script setup>
     const props = defineProps({
+        stockKey: {
+            type: String,
+            required: true
+        },
         nameTable: {
             type: String,
             required: true

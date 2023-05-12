@@ -37,6 +37,7 @@
         <AddProductForm 
             v-show="step === 1"
             ref="addProductForm"
+            :stock-key="stockKey"
             @press-next-button="nextStep"
             @focus-next-button="goNextButton"
         />

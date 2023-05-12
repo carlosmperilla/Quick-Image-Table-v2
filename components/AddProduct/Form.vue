@@ -2,15 +2,15 @@
     <form ref="form" class="add-product__form">
         <fieldset>
             <legend>Datos adicionales</legend>
-            <label for="product-name">Nombre de producto:</label>
-            <input ref="firstInput" type="text" name="product-name" id="product-name" v-model.trim="productInfo.name" required maxlength="50" @keydown.enter="nextInputFocus">
-            <label for="product-price">Precio de producto:</label>
-            <input type="number" name="product-price" id="product-price" v-model="productInfo.price" required min="0.0" step="any" @keydown.enter="nextInputFocus">
-            <label for="product-quantity">Cantidad de producto:</label>
+            <label :for="'product-name' + stockKey">Nombre de producto:</label>
+            <input ref="firstInput" type="text" :name="'product-name' + stockKey" :id="'product-name' + stockKey" v-model.trim="productInfo.name" required maxlength="50" @keydown.enter="nextInputFocus">
+            <label :for="'product-price' + stockKey">Precio de producto:</label>
+            <input type="number" :name="'product-price' + stockKey" :id="'product-price' + stockKey" v-model="productInfo.price" required min="0.0" step="any" @keydown.enter="nextInputFocus">
+            <label :for="'product-quantity' + stockKey">Cantidad de producto:</label>
             <input 
                 type="number" 
-                name="product-quantity" 
-                id="product-quantity"
+                :name="'product-quantity' + stockKey" 
+                :id="'product-quantity' + stockKey"
                 v-model="productInfo.quantity" 
                 required 
                 min="0" 
@@ -23,6 +23,12 @@
 
 <script setup>
     const productInfo = inject('productInfo')
+    const props = defineProps({
+        stockKey: {
+            type: String,
+            required: true
+        }
+    })
     const emit = defineEmits(['pressNextButton', 'focusNextButton'])
     const form = ref(null)
     const firstInput = ref(null)
