@@ -34,9 +34,6 @@ export default defineNuxtConfig({
         }
       }
     },
-    auth: {
-      origin: 'http://localhost:3000',
-    },
     routeRules: {
       '/contact': { static: true },
       '/howtouse': { static: true },
