@@ -174,7 +174,7 @@
             notifyLoggedIn.value = undefined
         }
 
-        if (notifyLoggedOut.value && isAuthenticated.value){
+        if (notifyLoggedOut.value && !isAuthenticated.value){
             setTimeout(() => {
                 notify({
                         type: "warn",
