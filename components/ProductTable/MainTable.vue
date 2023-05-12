@@ -26,9 +26,9 @@
                     <input type="number" name="price" min="0.0" step="0.01" v-if="isEditable" v-model.lazy="product.price" @input="(e) => updateProduct(product.uuid, e)">
                 </td>
                 <td class="table--card__quantity">
-                {{ !isEditable ? product.quantity : '' }}
-                <input type="number" name="quantity" v-if="isEditable" v-model.lazy="product.quantity" @input="(e) => updateProduct(product.uuid, e)" min="0">
-            </td>
+                    {{ !isEditable ? product.quantity : '' }}
+                    <input type="number" name="quantity" v-if="isEditable" v-model.lazy="product.quantity" @input="(e) => updateProduct(product.uuid, e)" min="0">
+                </td>
             </tr>
         </tbody>
     </table>
