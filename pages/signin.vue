@@ -30,7 +30,7 @@
         
     const { signIn } = useAuth()
 
-    const notifyLoggedIn = useCookie('notifyLoggedIn')
+    // const notifyLoggedIn = useCookie('notifyLoggedIn')
 
     const form = ref(null)
     const userSignData = reactive({
@@ -61,7 +61,7 @@
                 signinErrors.push(message)
             }
         } else {
-            notifyLoggedIn.value = true
+            // notifyLoggedIn.value = true
             return navigateTo(url, { external: true })
         }
 
