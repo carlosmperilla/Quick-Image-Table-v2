@@ -31,6 +31,8 @@ async function signInCredentials({ username, password } : SingnInData){
   const credentialsPassword = password || ''
   let userData: Object;
 
+  return {id: 1, username: 'Ejemplo2', password: '123QWE###'}
+
   if (isInvalidLength(credentialsUsername, 0, 50)) {
     errors.messages.push('Longitud de usuario invalida.')
   }
