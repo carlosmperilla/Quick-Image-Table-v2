@@ -43,7 +43,4 @@ export default defineNuxtConfig({
       '/about': { static: true },
       '/api/**': { cors: true }
     },
-    // runtimeConfig: {
-    //   apiBase: process.env
-    // }
 })

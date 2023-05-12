@@ -152,6 +152,11 @@
         if (error.value) {
             if (error.value?.data?.statusCode === 507) {
                 emit('excessSpaceErrorTrigger')
+                let rootElement = document.documentElement
+                rootElement.scrollTo({
+                    top: 0,
+                    behavior: "smooth"
+                })
             }
         }
     }

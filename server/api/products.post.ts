@@ -1,9 +1,7 @@
 import { getToken } from '#auth'
-import { useFetch } from "#app"
-
-const baseURL = 'https://quickimage.pythonanywhere.com/'
 
 export default eventHandler(async (event) => {
+    const API_BASE = process.env.NUXT_API_BASE
     const token = await getToken({ event })
     const ForbiddenError = createError({
                                 statusCode: 403,
@@ -23,7 +21,7 @@ export default eventHandler(async (event) => {
 
     try {
         productData = await $fetch('api/products/',{
-            baseURL,
+            baseURL: API_BASE,
             method: 'POST',
             headers: {
                 "Authorization": `Bearer ${(token as any).api_access_token}`,
@@ -31,7 +29,7 @@ export default eventHandler(async (event) => {
             },
             body: JSON.stringify({
                 ...body,
-                stock: `${baseURL}api/stocks/${body.stock}/`
+                stock: `${API_BASE}api/stocks/${body.stock}/`
             })
         });
     } catch (error) {
