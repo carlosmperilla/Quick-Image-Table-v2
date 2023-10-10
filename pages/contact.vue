@@ -4,7 +4,7 @@
             <h1>Contacto</h1>
         </header>
         <section>
-            <h2>Puedes ver mis proyectos en desarrollo aquí:</h2>
+            <h2>Puedes ver mis proyectos en desarrollo aquí 1,2,3:</h2>
             <p>
                 <a href="https://github.com/carlosmperilla" target="_blank" rel="noopener">https://github.com/carlosmperilla</a>
             </p>
