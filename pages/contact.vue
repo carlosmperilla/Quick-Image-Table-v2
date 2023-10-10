@@ -20,7 +20,6 @@
             <p class="page-email" tabindex="0" title="e-mail de contacto" alt="e-mail de contacto">
                 carlosperillaprogramacion@gmail.com
             </p>
-<a href="https://hootsuite.com/auth/authorize?client_id=lo0rtFoLazDDlsXWXElE&amp;nonce=a1ff4aa26b5c6145500e29fbb525f42f599b21b45e8c48f63d12324f25fab95f&amp;redirect_uri=https%3A%2F%2Fplatform.hootsuite.com%2Foauth2%2Fconsent&amp;response_type=id_token&amp;state=Y2xpZW50X3N0YXRlPXJlc3BvbnNlX3R5cGUlM0Rjb2RlJTI2Y2xpZW50X2lkJTNENGZkNDYwYTAtN2U4Ny00ZGM2LWE4NDAtOTkzZTViNmE0NGU0JTI2cmVkaXJlY3RfdXJpJTNEaHR0cHMlM0ElMkYlMkZ3d3cuZ2V0cG9zdG1hbi5jb20lMkZvYXV0aDIlMkZjYWxsYmFjayUyNnNjb3BlJTNEb2ZmbGluZSZzaWduYXR1cmU9JTgxJURBJTNCJTA0TiVENyVERSUxQiU5OCVFMCVDRSVDMWUlRTQlQUQlQkQlREUlQjF6JThGJUU2JUEwayVCRiVDMiUyNiUwNyU4RiVGNyUyMSU5RUIzJTlDJUM1JTkzYSslRTUlQUElODlEJTNDJTk2XyUyQiVCRiVERSVFNSVBMCVCNEglRjYlQThVJUNFck10eCUzRCVBMCVGRGE%3D">Found</a>.        </section>
     </article>
 </template>
 
